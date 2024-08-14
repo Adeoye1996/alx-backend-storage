@@ -22,11 +22,11 @@ def count_requests(method: Callable) -> Callable:
         redis_.setex(f"cached:{url}", 10, html)
         return html
 
-    return (wrapper)
+    return wrapper
 
 
 @count_requests
 def get_page(url: str) -> str:
     """ Obtain the HTML content of the  URL """
     req = requests.get(url)
-    return (req.text)
+    return req.text
