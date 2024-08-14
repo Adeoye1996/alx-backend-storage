@@ -1,31 +1,35 @@
+
 #!/usr/bin/env python3
-""" Redis basic """
+""" Redis module for exercise.py
+"""
+
 import redis
 from uuid import uuid4
+from typing import Union, Callable, Optional
 from functools import wraps
 UnionOfTypes = Union[str, bytes, int, float]
-from typing import Union, Callable, Optional
+
 
 def count_calls(method: Callable) -> Callable:
-    """ Decorator Counts  """
+    """ Decorator Counts how many times methods of Cache class are called """
     key = method.__qualname__
 
     @wraps(method)
     def wrapper(self, *args, **kwds):
-        """ This is wrapper function for decorator """
+        """ this is wrapper function for call_calls method """
         self._redis.incr(key)
         return method(self, *args, **kwds)
     return wrapper
 
 
 def call_history(method: Callable) -> Callable:
-    """ Stores the history of inputs and outputs for a particular function """
+    """ stores the history of inputs and outputs for a particular function """
     input_list = method.__qualname__ + ":inputs"
     output_list = method.__qualname__ + ":outputs"
 
     @wraps(method)
     def wrapper(self, *args) -> bytes:
-        """  Wrapper for decorator functionality """
+        """ This is wrapper function for call_history method """
         self._redis.rpush(input_list, str(args))
         output = method(self, *args)
         self._redis.rpush(output_list, output)
@@ -65,9 +69,9 @@ class Cache:
         return fn(data) if fn else data
 
     def get_str(self, data: str) -> str:
-        """ Get the string """
+        """ get a string """
         return self.get(key, str)
 
     def get_int(self, data: str) -> int:
-        """ Get an int """
+        """ get an int """
         return self.get(key, int)
